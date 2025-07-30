@@ -1,0 +1,63 @@
+#!/usr/bin/python3
+
+from tkinter import messagebox
+from tkinter import filedialog as fd
+from tkinter import ttk
+from tkinter import *
+from datetime import datetime
+
+import sv_ttk
+
+import subprocess
+import os
+
+def theme():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("THEME="):
+                    return line.strip().split("=")[1].strip('"')
+
+panel = Tk()
+panel.geometry(f"1280x40+{(panel.winfo_screenwidth() - 1283) // 2}+0")
+panel.attributes("-topmost", True)
+
+def distro():
+    with open("/etc/os-release") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("NAME="):
+                    return line.strip().split("=")[1].strip('"')
+
+def timeupd():
+    time.config(text = f"{datetime.now().strftime('%H:%M:%S')}")
+    panel.after(1, timeupd)
+
+def appsmenu():
+    tk = fd.askopenfilename(initialdir="/usr/bin")
+    subprocess.Popen([tk])
+
+apps_icon = PhotoImage()
+apps_icon.configure(file="/usr/bin/progwide/progwipanel/logo.png")
+
+panel_ui = ttk.Frame(panel)
+panel_ui.pack(expand=True, fill="both", side="right")
+
+menu = Menu(panel, tearoff=0)
+menu.add_command(label=f"About {distro()}", command=lambda:subprocess.run(["xterm", "-e", "fastfetch; bash"]))
+menu.add_command(label="Run", command=appsmenu)
+menu.add_command(label="Reboot", command=lambda:subprocess.run(["xterm", "-e", "sudo systemctl reboot; bash"]))
+menu.add_command(label="Shutdown", command=lambda:subprocess.run(["xterm", "-e", "sudo systemctl poweroff; bash"]))
+menu.add_command(label="About Progwipanel", command=lambda:messagebox.showinfo("About Progwipanel", "Progwipanel 1.0"))
+
+apps = ttk.Button(panel_ui, image=apps_icon, command=lambda:menu.post((panel.winfo_screenwidth() - 1283) // 2, 40))
+apps.pack(padx="10", side="left")
+
+time = Label(panel_ui, text = f"{datetime.now().strftime('%H:%M:%S')}")
+time.pack(expand=True, fill="both", side="right")
+
+timeupd()
+sv_ttk.set_theme(theme())
+
+panel.overrideredirect(True)
+panel.mainloop()
