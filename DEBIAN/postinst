@@ -1,0 +1,4 @@
+#!/bin/sh
+
+pip install sv_ttk --break-system-packages
+exit 0
