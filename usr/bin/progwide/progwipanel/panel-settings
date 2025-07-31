@@ -1,0 +1,111 @@
+#!/usr/bin/python3
+
+from tkinter import messagebox
+from tkinter import filedialog as fd
+from tkinter import ttk
+from tkinter import *
+from datetime import datetime
+
+import sv_ttk
+
+import subprocess
+import os
+
+def theme():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("THEME="):
+                    return line.strip().split("=")[1].strip('"')
+
+def panel_width():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("WIDTH="):
+                    return line.strip().split("=")[1].strip('"')
+
+def panel_height():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("HEIGHT="):
+                    return line.strip().split("=")[1].strip('"')
+
+def align():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("ALIGN="):
+                    return line.strip().split("=")[1].strip('"')
+
+def icon():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("ICON="):
+                    return line.strip().split("=")[1].strip('"')
+
+def theme_set():
+    sv_ttk.set_theme(theme())
+    app.after(10, theme_set)
+
+def apply_set():
+    with open("/usr/bin/progwide/progwipanel/config", "w") as f:
+        f.write(f"""
+THEME={themeinpt.get()}
+ICON={iconinpt.get()}
+WIDTH={widthinpt.get()}
+HEIGHT={heightinpt.get()}
+ALIGN={aligninpt.get()}
+""")
+
+app = Tk()
+app.title("Progwipanel Settings")
+
+thset = Frame(app)
+thset.pack(expand=True, fill="both")
+themelabel = Label(thset, text = "Theme:")
+themeinpt = ttk.Entry(thset)
+themelabel.pack(expand=True, fill="x", side="left")
+themeinpt.pack(expand=True, side="right")
+
+iconset = Frame(app)
+iconset.pack(expand=True, fill="both")
+iconlabel = Label(iconset, text = "Icon:")
+iconinpt = ttk.Entry(iconset)
+iconlabel.pack(expand=True, fill="x", side="left")
+iconinpt.pack(expand=True, side="right")
+
+widthset = Frame(app)
+widthset.pack(expand=True, fill="both")
+widthlabel = Label(widthset, text = "Width:")
+widthinpt = ttk.Entry(widthset)
+widthlabel.pack(expand=True, fill="x", side="left")
+widthinpt.pack(expand=True, side="right")
+
+heightset = Frame(app)
+heightset.pack(expand=True, fill="both")
+heightlabel = Label(heightset, text = "Height:")
+heightinpt = ttk.Entry(heightset)
+heightlabel.pack(expand=True, fill="x", side="left")
+heightinpt.pack(expand=True, side="right")
+
+alignset = Frame(app)
+alignset.pack(expand=True, fill="both")
+alignlabel = Label(alignset, text = "Align:")
+aligninpt = ttk.Entry(alignset)
+alignlabel.pack(expand=True, fill="x", side="left")
+aligninpt.pack(expand=True, side="right")
+
+apply = ttk.Button(app, text="Apply", command=apply_set)
+apply.pack(expand=True, fill="both")
+
+themeinpt.insert(0, f"{theme()}")
+iconinpt.insert(0, f"{icon()}")
+widthinpt.insert(0, f"{panel_width()}")
+heightinpt.insert(0, f"{panel_height()}")
+aligninpt.insert(0, f"{align()}")
+
+theme_set()
+app.mainloop()

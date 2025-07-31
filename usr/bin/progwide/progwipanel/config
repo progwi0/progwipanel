@@ -1,2 +1,5 @@
 THEME=light
 ICON=/usr/bin/progwide/progwipanel/logo.png
+WIDTH=1280
+HEIGHT=40
+ALIGN=center

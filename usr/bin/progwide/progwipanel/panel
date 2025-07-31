@@ -18,8 +18,43 @@ def theme():
                 if line.startswith("THEME="):
                     return line.strip().split("=")[1].strip('"')
 
+def panel_width():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("WIDTH="):
+                    return line.strip().split("=")[1].strip('"')
+
+def panel_height():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("HEIGHT="):
+                    return line.strip().split("=")[1].strip('"')
+
+def align():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("ALIGN="):
+                    return line.strip().split("=")[1].strip('"')
+
+def icon():
+    with open("/usr/bin/progwide/progwipanel/config") as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith("ICON="):
+                    return line.strip().split("=")[1].strip('"')
+
 panel = Tk()
-panel.geometry(f"1280x40+{(panel.winfo_screenwidth() - 1283) // 2}+0")
+
+# panel.geometry(f"1280x40+{(panel.winfo_screenwidth() - 1283) // 2}+0")
+
+if align() == "start":
+    panel.geometry(f"{panel_width()}x{panel_height()}+0+0")
+elif align() == "center":
+    panel.geometry(f"{panel_width()}x{panel_height()}+{(panel.winfo_screenwidth() - 1283) // 2}+0")
+
 panel.attributes("-topmost", True)
 
 def distro():
@@ -33,12 +68,16 @@ def timeupd():
     time.config(text = f"{datetime.now().strftime('%H:%M:%S')}")
     panel.after(1, timeupd)
 
+def theme_set():
+    sv_ttk.set_theme(theme())
+    panel.after(10, theme_set)
+
 def appsmenu():
     tk = fd.askopenfilename(initialdir="/usr/bin")
     subprocess.Popen([tk])
 
 apps_icon = PhotoImage()
-apps_icon.configure(file="/usr/bin/progwide/progwipanel/logo.png")
+apps_icon.configure(file=f"{icon()}")
 
 panel_ui = ttk.Frame(panel)
 panel_ui.pack(expand=True, fill="both", side="right")
@@ -48,7 +87,8 @@ menu.add_command(label=f"About {distro()}", command=lambda:subprocess.run(["xter
 menu.add_command(label="Run", command=appsmenu)
 menu.add_command(label="Reboot", command=lambda:subprocess.run(["xterm", "-e", "sudo systemctl reboot; bash"]))
 menu.add_command(label="Shutdown", command=lambda:subprocess.run(["xterm", "-e", "sudo systemctl poweroff; bash"]))
-menu.add_command(label="About Progwipanel", command=lambda:messagebox.showinfo("About Progwipanel", "Progwipanel 1.0"))
+menu.add_command(label="Progwipanel Settings", command=lambda:os.system("/usr/bin/progwide/progwipanel/panel-settings"))
+menu.add_command(label="About Progwipanel", command=lambda:messagebox.showinfo("About Progwipanel", "Progwipanel 2.0"))
 
 apps = ttk.Button(panel_ui, image=apps_icon, command=lambda:menu.post((panel.winfo_screenwidth() - 1283) // 2, 40))
 apps.pack(padx="10", side="left")
@@ -57,7 +97,7 @@ time = Label(panel_ui, text = f"{datetime.now().strftime('%H:%M:%S')}")
 time.pack(expand=True, fill="both", side="right")
 
 timeupd()
-sv_ttk.set_theme(theme())
+theme_set()
 
 panel.overrideredirect(True)
 panel.mainloop()
